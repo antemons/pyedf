@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 
-import state as st
+from .state import State
 import numpy as np
 import os
 import re
@@ -30,8 +30,8 @@ class Score(object):
             if self.verbose == 2: print("score: the states", self.states)
 
         else:
+            self.states = []
             if self.verbose: print("# score: no score file given.")
-                        self.states = []
 
         #if np.iterable(self.states) :
         #    self.states = np.sort(states)
@@ -109,7 +109,7 @@ class Score(object):
     def append(self, new_state=None, start=None, duration=None, annot=None):
 
         if new_state == None:
-            new_state = st.state(start=start, duration=duration, annot=annot)
+            new_state = State(start=start, duration=duration, annot=annot)
 
         self.states.append(new_state)
 

@@ -1,8 +1,8 @@
 #! /usr/bin/python
 
-import event
+from .event import Event, mystrtime
 import numpy as np
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 
@@ -17,7 +17,7 @@ def interval2state(interval, sampling_rate, epoch_start, annot=''):
 
 
 
-class State(event.Event):
+class State(Event):
 
     MINIMUM_DURATION = 0.1 # sec.
 
@@ -39,7 +39,7 @@ class State(event.Event):
             self.duration = float(duration) # in seconds 
 
         elif not endstring == None:
-            self.duration = (event.mystrtime(endstring)-self).total_seconds()
+            self.duration = (mystrtime(endstring)-self).total_seconds()
 
         else:
             raise ValueError("start, duration, annot = %s, %s, %s" % (str(start), str(duration), str(annot)))
@@ -52,17 +52,17 @@ class State(event.Event):
 
     def __str__(self):
 
-        return event.Event.__str__(self)+','+repr(self.duration)+','+self.annot
+        return Event.__str__(self)+','+repr(self.duration)+','+self.annot
 
     
     def __add__(self, other):
 
-        return State(start=event.datetime.datetime.__add__(self, other), duration=self.duration, annot=self.annot)
+        return State(start=datetime.__add__(self, other), duration=self.duration, annot=self.annot)
 
 
     def compute_end(self): # datetime object of end
 
-        self.end = event.datetime.datetime.__add__( self, timedelta(seconds=self.duration) )    # datetime object
+        self.end = datetime.__add__( self, timedelta(seconds=self.duration) )    # datetime object
 
 
     def state2time(self, start):

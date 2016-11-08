@@ -59,9 +59,9 @@ print("#####################")
 print("TEST : edf_hdr_struct")
 print("#####################\n")
 
-#hdr = edf_hdr_struct.edf_hdr_struct(filename=sample_edf, md5checksum=md5sum['sample.edf'])
-#print(hdr.read_physical_samples([0], 0, 10))
-#exit(0)
+hdr = edf_hdr_struct.edf_hdr_struct(filename=sample_edf, md5checksum=md5sum['sample.edf'])
+print(hdr.read_physical_samples([0], 0, 10))
+exit(0)
 
 try:
     hdr = edf_hdr_struct.edf_hdr_struct(filename=sample_edf, md5checksum=md5sum['sample.edf'])

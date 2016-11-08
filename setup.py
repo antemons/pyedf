@@ -84,15 +84,14 @@ link_args = []
 if ssl_available():
     compile_args.append('-DSSL')
     link_args.extend(['-lssl', '-lcrypto'])
-
     print("Compiling with SSL support.")
 
 
 
 edf_module = setuptools.Extension('pyedf/recording/lib/_edf',
-        sources            = ['src/edf.c', 'src/edflib.c'],
-        extra_compile_args = compile_args,
-        extra_link_args    = link_args)
+            sources            = ['src/edf.c', 'src/edflib.c'],
+            extra_compile_args = compile_args,
+            extra_link_args    = link_args)
 
 
 

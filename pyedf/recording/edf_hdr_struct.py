@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
-from edf_param_struct import edf_param_struct
-import channeltypes
+from .edf_param_struct import edf_param_struct
+from .channeltypes import get_type
 import ctypes as ct
 import numpy as np
 import datetime
@@ -16,8 +16,14 @@ if len(THISPATH) == 0:
     THISPATH = '.'
 
 libname = dict()
-libname['linux'] = THISPATH+'/lib/_edf.so'
-libname['linux2'] = libname['linux']
+v = sys.version_info
+if v >= (3, 0):
+    libname['linux'] = THISPATH+'/lib/_edf.cpython-{}{}m-x86_64-linux-gnu.so'.format(v[0], v[1])
+    libname['linux2'] = libname['linux']
+else:
+    libname['linux'] = THISPATH+'/lib/_edf.so'
+    libname['linux2'] = libname['linux']
+
 libname['darwin'] = libname['linux']
 libname['win32'] = THISPATH+'/edf.dll' 
 
@@ -27,7 +33,7 @@ if os.path.exists( libname[sys.platform] ):
     lib = ct.cdll.LoadLibrary( libname[sys.platform] )
 
 else:
-    raise ImportError('Unable to load library _edf.so')
+    raise ImportError('Unable to load library {}.'.format(libname[sys.platform]))
 
 
 ###
@@ -76,23 +82,23 @@ class edf_hdr_struct(ct.Structure):                    # this structure contains
         ("annotations_in_file", ct.c_longlong),            # number of annotations in the file
         ("signalparam", edf_param_struct*EDFLIB_MAXSIGNALS)]         # array of structs which contain the relevant signal parameters
 
-    opened = False
-
     def __init__(self, filename, md5checksum=None):
-
-        assert os.path.exists(filename), "File '{}' does not exist.".format(filename)
-
-        lib.read_my_header(filename, self, md5checksum)
         self.opened = True
-
-        self.start = datetime.datetime(year=self.startdate_year, month=self.startdate_month, day=self.startdate_day,
-                        hour=self.starttime_hour, minute=self.starttime_minute, second=self.starttime_second, microsecond=self.starttime_subsecond)
-        
+        assert os.path.exists(filename), "File '{}' does not exist.".format(filename)
+        lib.read_my_header(filename, self, md5checksum)
+        self.start = datetime.datetime(
+                            year = self.startdate_year,
+                            month=self.startdate_month,
+                            day=self.startdate_day,
+                            hour=self.starttime_hour,
+                            minute=self.starttime_minute,
+                            second=self.starttime_second,
+                            microsecond=self.starttime_subsecond)
         self.patient = self.patient.strip(' ')
 
         self.channelnames = [self.signalparam[i].label.strip(' ') for i in xrange(self.edfsignals)]
         self.samplingrates = np.asarray([int(self.signalparam[i].smp_in_datarecord / (self.datarecord_duration*100.*10**-9)) for i in xrange(self.edfsignals)])
-        self.channeltypes = np.asarray([channeltypes.get_type(self.signalparam[i]) for i in xrange(self.edfsignals)])
+        self.channeltypes = np.asarray([get_type(self.signalparam[i]) for i in xrange(self.edfsignals)])
 
 
     def read_physical_samples(self, channels, start, size):
@@ -122,9 +128,7 @@ class edf_hdr_struct(ct.Structure):                    # this structure contains
 
 
     def __del__(self):
-
-        if self.opened:
-            self.close()
+        self.close()
 
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from edf_param_struct import edf_param_struct
+from .edf_param_struct import edf_param_struct
 
 EEG_Channels = ['EEG',
         'FP1',

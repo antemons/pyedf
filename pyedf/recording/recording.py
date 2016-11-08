@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from edf_hdr_struct import edf_hdr_struct, read_md5
-import channeltypes
+from .edf_hdr_struct import edf_hdr_struct, read_md5
+from .channeltypes import is_channeltype
 import pyedf.score as score
 import datetime
 
@@ -37,7 +37,7 @@ class recording(edf_hdr_struct):
 
             elif type(channel) == np.typeDict['str'] or type(channel) == str:
 
-                if channeltypes.is_channeltype(channel):                                    # if it is a channel type : 
+                if is_channeltype(channel):                                    # if it is a channel type : 
                     channelindices.extend( np.arange(self.edfsignals)[self.channeltypes == channel] )    #        .. load all the channels.
 
                 else:
