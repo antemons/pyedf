@@ -28,7 +28,6 @@ class Score(object):
                 raise AttributeError
 
             self.states = self.load(filename)
-            print(self.states)
             if self.verbose > 0: print("score: score file '%s' found." % (filename))
             if self.verbose == 2: print("score: the states", self.states)
 
