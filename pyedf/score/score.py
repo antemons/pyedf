@@ -1,5 +1,6 @@
 #! /usr/bin/python
 
+from __future__ import with_statement
 
 from .state import State
 import numpy as np
@@ -18,24 +19,22 @@ class Score(object):
 
         self.verbose = verbose
         self.states  = states
+        self.filename = filename
 
-        if filename:
+        if not self.filename is None:
 
-            if os.path.exists(filename) == False:
+            if not os.path.exists(self.filename):
                 print("Score file %s does not exist." % (filename))
                 raise AttributeError
 
             self.states = self.load(filename)
+            print(self.states)
             if self.verbose > 0: print("score: score file '%s' found." % (filename))
             if self.verbose == 2: print("score: the states", self.states)
 
         else:
             self.states = []
             if self.verbose: print("# score: no score file given.")
-
-        #if np.iterable(self.states) :
-        #    self.states = np.sort(states)
-        #    self.interpret_states()
 
 
     def interpret_states(self):
@@ -54,46 +53,38 @@ class Score(object):
 
 
     def load(self, filename):
-
-        score_file = open(filename, 'r') 
         states = []
-
-        for line in score_file:
-
-            try:
-                if self.isComment(line):
-                    continue
-
-                line = line.strip('\n').strip('\r').strip(' ')
-                x = line.split(self.lineSeparator)
-
-                if len(x) > 0:                    # for example 1
-                    start = x[0].strip(' ')
-
-                if len(x) == 1:
-                    annot     = ''
-                    duration = ''
-
-                if len(x) == 2:
-                    annot     = x[1]
-                    duration = ''
-
-                elif len(x) > 2:                # for example 3.
-                    duration = x[1].strip(' ')
-                    annot     = x[2]
-
-
-                if duration == '':
-                    duration = '-1'
+        with open(filename, 'r') as score_file:
+            for line in score_file:
+                try:
+                    if self.isComment(line):
+                        continue
     
-                states.append( st.state(start=start, duration=duration, annot=annot) )
-
-            except:
-                if self.verbose > 0: print("# line not readable:", line)
-
-
-        score_file.close()
-
+                    line = line.strip('\n').strip('\r').strip(' ')
+                    x = line.split(self.lineSeparator)
+    
+                    if len(x) > 0:                    # for example 1
+                        start = x[0].strip(' ')
+    
+                    if len(x) == 1:
+                        annot     = ''
+                        duration = ''
+    
+                    if len(x) == 2:
+                        annot     = x[1]
+                        duration = ''
+    
+                    elif len(x) > 2:                # for example 3.
+                        duration = x[1].strip(' ')
+                        annot    = x[2]
+    
+                    if duration == '':
+                        duration = '-1'
+        
+                    states.append( State(start=start, duration=duration, annot=annot)  )
+    
+                except:
+                    if self.verbose > 0: print("# line not readable:", line)
         return states
 
 
