@@ -23,7 +23,7 @@ class recording(edf_hdr_struct):
 
     def select_channels(self, channels=None):
 
-        if channels == None:    # Select all channels.
+        if channels is None:    # Select all channels.
             return np.arange(self.edfsignals)
         
         elif not np.iterable(channels) or type(channels) == np.typeDict['str'] or type(channels) == str:    # Wenn channels nicht indizierbar oder ein String ist, ..
@@ -58,7 +58,7 @@ class recording(edf_hdr_struct):
 
 
         # Setup the channel information ..
-        if not (channels == None or np.iterable(channels)):
+        if not (channels is None or np.iterable(channels)):
             print("recording : Parameter 'channels' not understood.", channels)
             raise AttributeError
 
