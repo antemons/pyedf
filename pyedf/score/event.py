@@ -8,11 +8,11 @@ import datetime
 
 def strtime_format1(timestring):
 
-    if len(timestring) < 25:
+    if len(timestring) < 21:
         return None
 
     if timestring[4] == '-' and timestring[7] == '-' and timestring[10] == 'T' and timestring[13] == ':' and timestring[16] == ':' and timestring[19] == '.':
-        return datetime.datetime.strptime(timestring[:25], "%Y-%m-%dT%H:%M:%S.%f")
+        return datetime.datetime.strptime(timestring, "%Y-%m-%dT%H:%M:%S.%f")
 
     else:
         return None
@@ -25,7 +25,7 @@ def strtime_format2(timestring):
         return None
 
     if timestring[4] == '-' and timestring[7] == '-' and timestring[10] == 'T' and timestring[13] == ':' and timestring[16] == ':':
-        return datetime.datetime.strptime(timestring[:19], "%Y-%m-%dT%H:%M:%S")
+        return datetime.datetime.strptime(timestring, "%Y-%m-%dT%H:%M:%S")
 
     else:
         return None
@@ -34,11 +34,11 @@ def strtime_format2(timestring):
 
 def strtime_format3(timestring):
 
-    if len(timestring) < 25:
+    if len(timestring) < 21:
         return None
 
     if timestring[2] == '/' and timestring[5] == '/' and timestring[10] == ' ' and timestring[13] == ':' and timestring[16] == ':' and timestring[19] == '.':
-        return datetime.datetime.strptime(timestring[:25], "%m/%d/%Y %H:%M:%S.%f")
+        return datetime.datetime.strptime(timestring, "%m/%d/%Y %H:%M:%S.%f")
 
     else:
         return None
@@ -51,31 +51,41 @@ def strtime_format4(timestring):
         return None
 
     if timestring[2] == '/' and timestring[5] == '/' and timestring[10] == ' ' and timestring[13] == ':' and timestring[16] == ':':
-        return datetime.datetime.strptime(timestring[:19], "%m/%d/%Y %H:%M:%S")
+        return datetime.datetime.strptime(timestring, "%m/%d/%Y %H:%M:%S")
 
     else:
         return None
 
 
 
+def strtime_lastresort(timestring):
+    try:
+        return datetime.datetime.strptime(timestring[:25], "%Y-%m-%dT%H:%M:%S.%f")
+    except:
+        return None
+
+
 strtime_formats = [strtime_format1,
-           strtime_format2,
-           strtime_format3,
-           strtime_format4]
+                   strtime_format2,
+                   strtime_format3,
+                   strtime_format4,
+                   strtime_lastresort]
 
 
 
 def mystrtime(timestring):
 
     dtime = None
+    timestring = timestring.strip('\n').strip('\r').strip(' ')
 
     for strtime in strtime_formats:
         dtime = strtime( timestring )
     
-        if not dtime == None:
+        if not dtime is None:
             return dtime
     
-    if dtime == None:
+    if dtime is None:
+        print(len(timestring))
         print("mystrtime::error : Unknown time string '"+timestring+"'")
 
     return None
