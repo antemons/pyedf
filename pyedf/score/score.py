@@ -2,6 +2,7 @@
 
 from __future__ import with_statement
 
+import logging
 from .state import State
 import numpy as np
 import os
@@ -11,12 +12,14 @@ import re
 
 class Score(object):
 
+    logger = logging.getLogger(name='Score')
+
     commentSymbol = '#'    # used for comments in state.annot
     lineSeparator = ','    # used as separators in the line
     states_dict = dict()
 
     def __init__(self, filename=None, states=[], verbose=0):
-
+        self.logger.debug("filename={}, num_states={}".format(filename, states))
         self.verbose = verbose
         self.states  = states
         self.filename = filename
