@@ -15,7 +15,7 @@ class Score(object):
     lineSeparator = ','    # used as separators in the line
     states_dict = dict()
 
-    def __init__(self, filename=None, states=None, verbose=0):
+    def __init__(self, filename=None, states=[], verbose=0):
 
         self.verbose = verbose
         self.states  = states
@@ -28,12 +28,8 @@ class Score(object):
                 raise AttributeError
 
             self.states = self.load(filename)
-            if self.verbose > 0: print("score: score file '%s' found." % (filename))
+            if self.verbose > 0:  print("score: score file '%s' found." % (filename))
             if self.verbose == 2: print("score: the states", self.states)
-
-        else:
-            self.states = []
-            if self.verbose: print("# score: no score file given.")
 
 
     def interpret_states(self):
