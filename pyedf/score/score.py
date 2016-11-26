@@ -19,7 +19,7 @@ class Score(object):
     states_dict = dict()
 
     def __init__(self, filename=None, states=[], verbose=0):
-        self.logger.debug("filename={}, num_states={}".format(filename, states))
+        self.logger.debug("__init__(filename={}, num_states={})".format(filename, states))
         self.verbose = verbose
         self.states  = states
         self.filename = filename
@@ -51,6 +51,7 @@ class Score(object):
 
 
     def load(self, filename):
+        self.logger.debug("load(filename='{}')".format(filename))
         states = []
         with open(filename, 'r') as score_file:
             for line in score_file:
@@ -81,8 +82,8 @@ class Score(object):
         
                     states.append( State(start=start, duration=duration, annot=annot)  )
     
-                except:
-                    if self.verbose > 0: print("# line not readable:", line)
+                except Exception as e:
+                    self.logger.debug("# line not readable: {}\n{}".format(line, e))
         return states
 
 

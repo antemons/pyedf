@@ -2,57 +2,33 @@
 
 
 
+import logging
 import datetime
+import numpy as np
 
+
+logger = logging.getLogger(name='event')
 
 
 def strtime_format1(timestring):
-
-    if len(timestring) < 21:
-        return None
-
-    if timestring[4] == '-' and timestring[7] == '-' and timestring[10] == 'T' and timestring[13] == ':' and timestring[16] == ':' and timestring[19] == '.':
-        return datetime.datetime.strptime(timestring, "%Y-%m-%dT%H:%M:%S.%f")
-
-    else:
-        return None
-
-
-
-def strtime_format2(timestring):
-
     if len(timestring) < 19:
         return None
-
     if timestring[4] == '-' and timestring[7] == '-' and timestring[10] == 'T' and timestring[13] == ':' and timestring[16] == ':':
-        return datetime.datetime.strptime(timestring, "%Y-%m-%dT%H:%M:%S")
-
+        datehourmin = datetime.datetime.strptime(timestring[:16], "%Y-%m-%dT%H:%M")
+        seconds =  datetime.timedelta(seconds=np.float(timestring[17:]))
+        return datehourmin + seconds
     else:
         return None
 
 
 
 def strtime_format3(timestring):
-
-    if len(timestring) < 21:
-        return None
-
-    if timestring[2] == '/' and timestring[5] == '/' and timestring[10] == ' ' and timestring[13] == ':' and timestring[16] == ':' and timestring[19] == '.':
-        return datetime.datetime.strptime(timestring, "%m/%d/%Y %H:%M:%S.%f")
-
-    else:
-        return None
-
-
-
-def strtime_format4(timestring):
-
     if len(timestring) < 19:
         return None
-
     if timestring[2] == '/' and timestring[5] == '/' and timestring[10] == ' ' and timestring[13] == ':' and timestring[16] == ':':
-        return datetime.datetime.strptime(timestring, "%m/%d/%Y %H:%M:%S")
-
+        datehourmin = datetime.datetime.strptime(timestring[:16], "%m/%d/%Y %H:%M")
+        seconds =  datetime.timedelta(seconds=np.float(timestring[17:]))
+        return datehourmin + seconds
     else:
         return None
 
@@ -66,28 +42,20 @@ def strtime_lastresort(timestring):
 
 
 strtime_formats = [strtime_format1,
-                   strtime_format2,
                    strtime_format3,
-                   strtime_format4,
                    strtime_lastresort]
 
 
 
 def mystrtime(timestring):
-
     dtime = None
     timestring = timestring.strip('\n').strip('\r').strip(' ')
-
     for strtime in strtime_formats:
         dtime = strtime( timestring )
-    
         if not dtime is None:
             return dtime
-    
     if dtime is None:
-        print(len(timestring))
-        print("mystrtime::error : Unknown time string '"+timestring+"'")
-
+        logger.debug("mystrtime::error : Unknown time string '"+timestring+"'")
     return None
 
 

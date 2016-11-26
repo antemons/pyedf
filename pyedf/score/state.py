@@ -3,6 +3,7 @@
 from .event import Event, mystrtime
 import numpy as np
 from datetime import timedelta, datetime
+import logging
 
 
 
@@ -18,6 +19,8 @@ def interval2state(interval, sampling_rate, epoch_start, annot=''):
 
 
 class State(Event):
+
+    logger = logging.getLogger(name='State')
 
     MINIMUM_DURATION = 0.1 # sec.
 
