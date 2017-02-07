@@ -21,7 +21,7 @@ class Score(object):
     def __init__(self, filename=None, states=[], verbose=0):
         self.logger.debug("__init__(filename={}, num_states={})".format(filename, states))
         self.verbose = verbose
-        self.states  = states
+        self.set_states(states)
         self.filename = filename
 
         if not self.filename is None:
@@ -30,9 +30,13 @@ class Score(object):
                 print("Score file %s does not exist." % (filename))
                 raise AttributeError
 
-            self.states = self.load(filename)
+            self.set_states(self.load(filename))
             if self.verbose > 0:  print("score: score file '%s' found." % (filename))
             if self.verbose == 2: print("score: the states", self.states)
+
+
+    def set_states(self, states):
+        self.states = states
 
 
     def interpret_states(self):
@@ -88,19 +92,15 @@ class Score(object):
 
 
     def save(self, filename):
-
         print("# opening", filename, "to write ...")
-        score_file = open(filename, 'w')
-        string = '# start, duration, annotation\n'+self.__str__()
-        score_file.write(string + '\n')
-        score_file.close()
+        with open(filename, 'w') as score_file:
+            string = '# start, duration, annotation\n'+self.__str__()
+            score_file.write(string + '\n')
 
 
     def append(self, new_state=None, start=None, duration=None, annot=None):
-
-        if new_state == None:
+        if new_state is None:
             new_state = State(start=start, duration=duration, annot=annot)
-
         self.states.append(new_state)
 
 
@@ -163,6 +163,32 @@ class Score(object):
 
         return count
 
+
+    def connect_adjacent_states(self, close=0.01):
+        if len(self.states) == 0: return
+        new_states    = []
+        last_annot    = self.states[0].annot
+        last_duration = self.states[0].duration
+        last_start    = self.states[0] # will be interpreted as datetime.datetime
+
+        for state in self.states[1:]:
+            dt = np.abs((state-last_start.end).total_seconds())
+            if dt < close and last_annot == state.annot:
+                last_duration += (state.end-last_start.end).total_seconds()
+            else:
+                new_state = State(start=last_start, duration=last_duration, annot=last_annot)
+                new_states.append(new_state)
+                last_annot    = state.annot
+                last_duration = state.duration
+                last_start    = state # will be interpreted as datetime.datetime
+
+        new_state = State(start=last_start, duration=last_duration, annot=last_annot)
+        new_states.append(new_state)
+        self.logger.debug("Length of individual states: {} seconds.".format(sum(state.duration for state in self.states)))
+        self.logger.debug("Length of connected  states: {} seconds.".format(sum(state.duration for state in new_states)))
+
+        self.set_states(new_states)
+        
 
 
 score = Score

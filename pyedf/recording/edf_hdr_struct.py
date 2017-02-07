@@ -8,6 +8,9 @@ import datetime
 import sys
 import os
 
+if not hasattr(__builtins__, 'xrange'):
+    xrange = range
+
 
 # Set up the path to the foreign library
 THISPATH = os.path.dirname(__file__)
@@ -66,7 +69,7 @@ class edf_hdr_struct(ct.Structure):                    # this structure contains
         ("starttime_second", ct.c_int),       
         ("starttime_minute", ct.c_int),       
         ("starttime_hour", ct.c_int),       
-        ("patient", ct.c_char*81),            # null-terminated string, contains patientfield of header, is always empty when filetype is EDFPLUS or BDFPLUS
+        ("patient_b", ct.c_char*81),            # null-terminated string, contains patientfield of header, is always empty when filetype is EDFPLUS or BDFPLUS
         ("recording", ct.c_char*81),        # null-terminated string, contains recordingfield of header, is always empty when filetype is EDFPLUS or BDFPLUS
         ("patientcode", ct.c_char*81),        # null-terminated string, is always empty when filetype is EDF or BDF
         ("gender", ct.c_char*16),                   # null-terminated string, is always empty when filetype is EDF or BDF
@@ -85,20 +88,24 @@ class edf_hdr_struct(ct.Structure):                    # this structure contains
     def __init__(self, filename, md5checksum=None):
         self.opened = True
         assert os.path.exists(filename), "File '{}' does not exist.".format(filename)
-        lib.read_my_header(filename, self, md5checksum)
-        self.start = datetime.datetime(
-                            year = self.startdate_year,
-                            month=self.startdate_month,
-                            day=self.startdate_day,
-                            hour=self.starttime_hour,
-                            minute=self.starttime_minute,
-                            second=self.starttime_second,
-                            microsecond=self.starttime_subsecond)
-        self.patient = self.patient.strip(' ')
+        if md5checksum is not None:
+            md5checksum = md5checksum.encode('utf-8')
+        lib.read_my_header(filename.encode('utf-8'), self, md5checksum)
 
-        self.channelnames = [self.signalparam[i].label.strip(' ') for i in xrange(self.edfsignals)]
+        self.start = datetime.datetime(
+            year        = self.startdate_year,
+            month       = self.startdate_month,
+            day         = self.startdate_day,
+            hour        = self.starttime_hour,
+            minute      = self.starttime_minute,
+            second      = self.starttime_second,
+            microsecond = self.starttime_subsecond
+        )
+        self.patient = self.patient_b.decode('utf-8').strip(' ')
+
+        self.channelnames  = [self.signalparam[i].label_b.decode('utf-8').strip(' ') for i in xrange(self.edfsignals)]
         self.samplingrates = np.asarray([int(self.signalparam[i].smp_in_datarecord / (self.datarecord_duration*100.*10**-9)) for i in xrange(self.edfsignals)])
-        self.channeltypes = np.asarray([get_type(self.signalparam[i]) for i in xrange(self.edfsignals)])
+        self.channeltypes  = np.asarray([get_type(self.signalparam[i]) for i in xrange(self.edfsignals)])
 
 
     def read_physical_samples(self, channels, start, size):
