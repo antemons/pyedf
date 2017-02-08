@@ -42,18 +42,8 @@ else:
 ###
 
 
-
 EDFLIB_MAXSIGNALS = 256
 MD5_DIGEST_LENGTH = 16
-
-
-
-def STRING(size):
-    return ct.cast( ct.create_string_buffer(size+1), ct.POINTER(ct.c_char*(size+1)) )
-
-def CHARRAY(size):
-    return r' '*(size+1)#ct.create_string_buffer(size+1)
-
 
 
 class edf_hdr_struct(ct.Structure):                    # this structure contains all the relevant EDF header info and will be filled when calling the function edf_open_file_readonly()
