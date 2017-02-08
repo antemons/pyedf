@@ -9,6 +9,8 @@ import datetime
 import logging
 
 
+if not hasattr(__builtins__, 'xrange'):
+    xrange = range
 
 
 class Recording(edf_hdr_struct):
