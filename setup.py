@@ -7,7 +7,7 @@ from textwrap import dedent
 
 
 def ssl_available():
-    """check if the C module can be build by trying to compile a small 
+    """check if the C module can be build by trying to compile a small
     program against the libssl development library"""
 
     import tempfile
@@ -104,6 +104,7 @@ setuptools.setup(
     license      = "GPLv2",
     keywords     = "edf",
     url          = "https://github.com/jusjusjus/pyedf",
-    packages     = ['pyedf', 'pyedf/recording', 'pyedf/derivation', 'pyedf/score'],
+    packages     = ['pyedf', 'pyedf/recording', 'pyedf/derivation',
+                    'pyedf/score', 'pyedf/synthetic'],
     ext_modules	 = [edf_module],
     classifiers	 = classifiers)
